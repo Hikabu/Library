@@ -56,7 +56,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',#compresses and caches static files, reducing load times.
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -115,6 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -141,6 +141,7 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 
 
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_SIGNATURE_NAME = 's3v4'
 
@@ -148,7 +149,6 @@ AWS_S3_SIGNATURE_NAME = 's3v4'
 AWS_DEFAULT_ACL = None
 AWS_S3_VERIFY = True
 
-#main part: this pushes static files to S3
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 
 #this one is for media files, you can keep it if you're using media
@@ -159,6 +159,7 @@ STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{STATICFILES_LOCATION}/"
 
 MEDIAFILES_LOCATION = "media"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{MEDIAFILES_LOCATION}/"
+
 STORAGES = {
     "default": {"BACKEND": "project.storage.MediaStorage"},
     "staticfiles": {"BACKEND": "project.storage.StaticStorage"},
@@ -174,15 +175,11 @@ CSRF_COOKIES_HTTPONLY = False # Allows JS to read the CSRF cookie
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = False 
 
-
 # Allow WebSocket connections
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
     "https://localhost",
-    "http://localhost:5173",  # dev
-    "http://django-transendence.s3-website-us-east-1.amazonaws.com",
 ]
-
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
     "https://localhost",
@@ -193,11 +190,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 """
     rest - how the framework handles authentication and permissions for API endpoints
-    requiring usr to include a valid JWT in the Authorization header of their requests (Bearer token). 
         The server validates the token to authenticate the user and 
     ensures that only authenticated users can access the API endpoints.
-"""
+
 REST_FRAMEWORK = {
+    'STATIC_URL': STATIC_URL,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'project.apps.custom_auth.authentication.CookieJwtAuthentication',
     ),
@@ -273,6 +270,7 @@ LOGGING = {
         },
     },
     "loggers": {
+        "django": {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
